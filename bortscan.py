@@ -26,8 +26,7 @@ class BortScanner():
         if len(sys.argv) > 1:
             hosts = [sys.argv[1]]
         else:
-            for ip in range(1, 255):
-                hosts.append("192.168.2." + str(ip))
+            hosts.extend(f"192.168.2.{str(ip)}" for ip in range(1, 255))
         return hosts
 
     def scanPort(self, host, port):
@@ -37,11 +36,11 @@ class BortScanner():
         try:
             result = s.connect_ex((host, port))
             if result == 0:
-                print("[!] Open: %s" % str(port))
+                print(f"[!] Open: {str(port)}")
                 self.isHostDown = False
-            elif result == 113 or result == 11:
+            elif result in [113, 11]:
                 self.isHostDown = True
-                print("Host %s seems to be down.." % str(host))
+                print(f"Host {str(host)} seems to be down..")
             s.close()
         except: pass
 

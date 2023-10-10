@@ -24,11 +24,11 @@ def startListening(localHost, localPort, remoteHost, remotePort, shouldReceiveFi
     server.bind((localHost, int(localPort)))
     server.listen(5)
     serverAddress = str(server.getsockname())
-    print ("[ # ] Simulating proxy server " + serverAddress)
+    print(f"[ # ] Simulating proxy server {serverAddress}")
 
     while True:
         clientSocket, address = server.accept()
-        print("[ < ] FTP client %s connected to proxy %s " % (str(address), serverAddress))
+        print(f"[ < ] FTP client {str(address)} connected to proxy {serverAddress} ")
         proxyThread = threading.Thread(target=distributeTraffic, args=(clientSocket, localHost, localPort, remoteHost, remotePort, shouldReceiveFirst))
         proxyThread.start()
 
@@ -38,7 +38,9 @@ def receiveFrom(socket):
 def distributeTraffic(ftpClientSocket, localHost, localPort, remoteHost, remotePort, shouldReceiveFirst):
     ftpServerSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     ftpServerSocket.connect((remoteHost, int(remotePort)))
-    print("[ > ] Proxy %s connected to FTP server " % str(ftpServerSocket.getsockname()))
+    print(
+        f"[ > ] Proxy {str(ftpServerSocket.getsockname())} connected to FTP server "
+    )
 
     while True:
         # remote data going through proxy to local socket
@@ -48,19 +50,26 @@ def distributeTraffic(ftpClientSocket, localHost, localPort, remoteHost, remoteP
         ftpClientAddress = str(ftpClientSocket.getsockname())
         if remoteBufferLength:
             remoteBufferDecoded = remoteBuffer.decode("utf8").rstrip()
-            print("[ < ] Proxy %s received from FTP server" % str(ftpServerSocket.getsockname()) + ": '" + remoteBufferDecoded + "' [" + str(remoteBufferLength) + " bytes]")
+            print(
+                f"[ < ] Proxy {str(ftpServerSocket.getsockname())} received from FTP server: '{remoteBufferDecoded}' [{remoteBufferLength} bytes]"
+            )
             ftpClientSocket.send(remoteBuffer)
-            print("[ > ] Proxy %s sent '%s' to FTP client %s " % ((ftpClientAddress, remoteBufferDecoded, str(ftpClientSocket.getpeername()))))
+            print(
+                f"[ > ] Proxy {ftpClientAddress} sent '{remoteBufferDecoded}' to FTP client {str(ftpClientSocket.getpeername())} "
+            )
 
         # local data going through proxy to remote socket
         localBuffer = receiveFrom(ftpClientSocket)
         localBufferDecoded = localBuffer.decode("utf8").rstrip()
 
         if len(localBuffer):
-            print("[ < ] Proxy %s received '%s' from FTP client %s" % (
-            ftpClientAddress, localBufferDecoded, str(ftpClientSocket.getpeername())))
+            print(
+                f"[ < ] Proxy {ftpClientAddress} received '{localBufferDecoded}' from FTP client {str(ftpClientSocket.getpeername())}"
+            )
             ftpServerSocket.send(localBuffer)
-            print("[ > ] Proxy %s sent '%s' to FTP server: " %(str(ftpServerSocket.getsockname()), localBufferDecoded))
+            print(
+                f"[ > ] Proxy {str(ftpServerSocket.getsockname())} sent '{localBufferDecoded}' to FTP server: "
+            )
 
 
 

@@ -38,12 +38,12 @@ class Snibber:
         subprocess.Popen(PROMISCUOUS_MODE + mode, shell=True)
 
     def isThiswindows(self):
-        return True if "nt" in os.name else False
+        return "nt" in os.name
 
     def startListening(self):
         sniffer = socket.socket(socket.AF_INET, socket.SOCK_RAW, self.getSocketProtocol())
         sniffer.bind((HOST, 0))
-        print("[ # ] Snibber bound to %s" % HOST)
+        print(f"[ # ] Snibber bound to {HOST}")
         return sniffer
 
     def getSocketProtocol(self):
@@ -56,8 +56,8 @@ class Snibber:
 
     def isFTPlogin(self, IPheader):
         packetData = IPheader.data.lower()
-        if IPheader.destinationPort is 21 or IPheader.sourcePort is 21:
-            if packetData.find("user") > -1 or packetData.find("pass") > -1:
+        if packetData.find("user") > -1 or packetData.find("pass") > -1:
+            if IPheader.destinationPort is 21 or IPheader.sourcePort is 21:
                 print("We have an attempt to login to FTP!\n" + IPheader.data)
 
 snibber = Snibber()
