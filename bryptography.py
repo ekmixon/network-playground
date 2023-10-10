@@ -4,7 +4,7 @@ plainText= "tis gona beh encrypted message"
 privateKey = RSA.generate(1024)
 publicKey = privateKey.publickey()
 
-print("Encrypting... %s" % plainText)
+print(f"Encrypting... {plainText}")
 cipherText = publicKey.encrypt(plainText, 32)
 print(cipherText)
 

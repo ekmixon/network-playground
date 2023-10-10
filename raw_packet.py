@@ -49,7 +49,7 @@ WINDOW = socket.htons(0)
 TCP_HEADER_CHECKSUM = 0
 
 connection = socket.socket(socket.AF_PACKET, socket.SOCK_RAW)
-connection.bind((('%s' % NETWORK_INTERFACE), socket.SOCK_RAW))
+connection.bind((f'{NETWORK_INTERFACE}', socket.SOCK_RAW))
 
 packet = [
     # Frame datagram
@@ -84,7 +84,7 @@ packet = [
 
 counter = 0
 while 1:
-    print("Sending packet %s %s" % (str(counter), str(packet)))
+    print(f"Sending packet {str(counter)} {packet}")
     connection.send(b''.join(packet))
     time.sleep(.1)
     counter += 1

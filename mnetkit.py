@@ -65,7 +65,7 @@ class mnetkit():
                 options, arguments = getopt.getopt(arguments, "hle:t:p:c:u:")
                 return options, arguments
             except getopt.GetoptError as error:
-                print(str(error))
+                print(error)
                 self.displayUsage()
 
     def captureCommand(self):
@@ -94,7 +94,7 @@ class mnetkit():
         return (UPLOAD_ANCHOR + fileName + "#").encode("utf8") + fileData
 
     def startListening(self):
-        print ("Listening on " + self.host + ":" + str(self.port))
+        print(f"Listening on {self.host}:{str(self.port)}")
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server.bind((self.host, int(self.port)))
         server.listen(5)
@@ -132,31 +132,23 @@ class mnetkit():
                 package = self.buildPackageForDownload(clientRequest)
                 clientSocket.send(package)
 
-            # if "gnome-screenshot" in clientRequest:
-            #     find a way to upload/download screenshots
-                # self.executeCommand("gnome-screenshot")
-                # package = self.buildPackageForDownload(clientRequest)
-                # clientSocket.send(package)
-
-            # remote host send the file back to the client;
             elif "upload" in clientRequest:
                 fileName, fileData = self.getFileNameAndFileData(clientRequest)
                 self.saveToFile(fileName, fileData)
-                print(fileName.rstrip() + " downloaded to " + os.getcwd())
+                print(f"{fileName.rstrip()} downloaded to {os.getcwd()}")
                 clientSocket.send(b'File uploaded!')
             else:
                 clientSocket.send(self.executeCommand(clientRequest))
 
-            print("Executing: " + clientRequest)
+            print(f"Executing: {clientRequest}")
 
     def buildPackageForDownload(self, clientRequest):
         fileName, filePath = self.getFileNameAndPath(clientRequest)
         fileData = self.readFileData(filePath)
-        package = (DOWNLOAD_ANCHOR + fileName + "#").encode("utf8") + fileData
-        return package
+        return (DOWNLOAD_ANCHOR + fileName + "#").encode("utf8") + fileData
 
     def readFileData(self, filePath):
-        return self.executeCommand("cat " + filePath)
+        return self.executeCommand(f"cat {filePath}")
 
     def getFileNameAndPath(self, clientRequest):
         filePath = clientRequest[clientRequest.find(" ") + 1:]
@@ -181,16 +173,15 @@ class mnetkit():
             if DOWNLOAD_ANCHOR in response:
                 fileName, response = self.getFileNameAndFileData(response)
                 self.saveToFile(fileName, response)
-                print(fileName.rstrip() + " downloaded to " + os.getcwd())
+                print(f"{fileName.rstrip()} downloaded to {os.getcwd()}")
             else:
                 print(response)
 
             self.sendCommand()
 
     def saveToFile(self, fileName, fileData):
-        file = open(fileName, mode="w+")
-        file.write(fileData)
-        file.close()
+        with open(fileName, mode="w+") as file:
+            file.write(fileData)
 
     def getFileNameAndFileData(self, response):
         fileName = response.split("#")[2]
@@ -199,7 +190,7 @@ class mnetkit():
             anchor = DOWNLOAD_ANCHOR
         elif UPLOAD_ANCHOR in response:
             anchor = UPLOAD_ANCHOR
-        fileData = response.strip(anchor).strip(fileName + "#")
+        fileData = response.strip(anchor).strip(f"{fileName}#")
         return fileName, fileData
 
 kit = mnetkit()

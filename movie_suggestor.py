@@ -35,12 +35,12 @@ class MovieSuggestor():
         )
 
     def login(self):
-        response = self.linkomania.attemptLogin(username=self.username, password=self.password)
-        return response
+        return self.linkomania.attemptLogin(
+            username=self.username, password=self.password
+        )
 
     def parseXMLfromString(self, string):
-        root = xmlTree.fromstring(string)
-        return root
+        return xmlTree.fromstring(string)
 
     def parseTorrents(self, root):
         torrents = []
@@ -57,13 +57,13 @@ class MovieSuggestor():
         return torrents
 
     def sendRequest(self, url):
-        response = self.linkomania.getUrlContent(url, self.linkomania.headers)
-        return response
+        return self.linkomania.getUrlContent(url, self.linkomania.headers)
 
     def getDecentlyRatedMovies(self, torrents):
-      for torrent in torrents:
-            isDecentlyRated = re.search('(<b>Rating:<\/b> [7-9.]+\w)', torrent.description)
-            if isDecentlyRated:
+        for torrent in torrents:
+            if isDecentlyRated := re.search(
+                '(<b>Rating:<\/b> [7-9.]+\w)', torrent.description
+            ):
                 rating = isDecentlyRated.group(0).strip("<b>Rating:</b> ")
                 print("[%s imdb] %s  [>] %s \n%s \n" %(rating, torrent.title, torrent.link, torrent.torrentLink))
 

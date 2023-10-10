@@ -11,7 +11,7 @@ class Barvester():
 
     def __init__(self):
         query = sys.argv[1]
-        print("Googling... " + query)
+        print(f"Googling... {query}")
         searchResults = self.getSearchResults(query.replace(" ", "%20"))
         urls = self.extractUrlsFromBody(searchResults)
         self.startCrawling(urls)
@@ -32,10 +32,8 @@ class Barvester():
     def hasAnythingInteresting(self, htmlBody):
         emailPattern = '([a-zA-Z0-9.]+@[a-zA-Z0-9].\B.[a-zA-Z0-9.]+)'
         regexp = re.compile(emailPattern)
-        emailsList = regexp.findall(htmlBody)
-
-        if emailsList:
-            print("[<<] Goodies: " + str(emailsList))
+        if emailsList := regexp.findall(htmlBody):
+            print(f"[<<] Goodies: {str(emailsList)}")
 
     def getSearchResults(self, searchQuery):
         baseUrl = "http://www.google.com/search?num=1000&q="
@@ -43,17 +41,14 @@ class Barvester():
         return self.retrieveHtmlBody(searchUrl)
 
     def retrieveHtmlBody(self, url):
-        headers = {}
-        headers['User-Agent'] = "Googlebot"
-
+        headers = {'User-Agent': "Googlebot"}
         try:
             response = self.poolManager.request('GET', url, headers=headers)
             htmlBody = response.data
         except:
-            print("%s down" % url)
+            print(f"{url} down")
             htmlBody = "Website down"
-            pass
-        print("[>] Crawling " + url)
+        print(f"[>] Crawling {url}")
 
         return htmlBody
 
